@@ -158,7 +158,7 @@ function ScatterChartWithZoom() {
         tr2.appendChild(text2);
         tr3.appendChild(link);
 
-        // tr.appendChild(td);
+
         tableBody.appendChild(tr2);
         tableBody.appendChild(tr1);
         tableBody.appendChild(tr3);
@@ -343,9 +343,7 @@ function ScatterChartWithZoom() {
       },
       tooltip: {
         events: ["click"],
-        // onclick:{
-        //   console.log("980980")
-        // },
+
 
         usePointStyle: true,
         callbacks: {
