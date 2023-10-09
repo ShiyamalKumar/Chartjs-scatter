@@ -35,15 +35,17 @@ function ScatterChartWithZoom() {
     let tooltipEl = chart.canvas.parentNode.querySelector("div");
 
     if (!tooltipEl) {
+
       tooltipEl = document.createElement("div");
       tooltipEl.style.background = "rgba(0, 0, 0, 0.7)";
-      tooltipEl.style.borderRadius = "3px";
       tooltipEl.style.color = "white";
       tooltipEl.style.opacity = 1;
       tooltipEl.style.pointerEvents = "none";
       tooltipEl.style.position = "absolute";
       tooltipEl.style.transform = "translate(-50%, 0)";
       tooltipEl.style.transition = "all .1s ease";
+      tooltipEl.style.display = 'flex';
+      tooltipEl.style.flexDirection = 'row';
 
       const table = document.createElement("table");
       table.style.margin = "0px";
@@ -59,6 +61,9 @@ function ScatterChartWithZoom() {
     const { chart, tooltip } = context;
     const tooltipEl = getOrCreateTooltip(chart);
 
+    console.log(tooltip)
+    tooltip.labelColors[0].backgroundColor = "#ffffff"
+    tooltip.labelColors[0].borderColor = "#ffffff"
     if (tooltip.opacity === 0) {
       tooltipEl.style.opacity = 0;
       return;
@@ -68,48 +73,51 @@ function ScatterChartWithZoom() {
       const titleLines = tooltip.title || [];
       const bodyLines = tooltip.body.map((b) => b.lines);
 
-      const tableHead = document.createElement("thead");
+
+      const tableBody1 = document.createElement("tbody");
 
       titleLines.forEach((title) => {
         const tr = document.createElement("tr");
         tr.style.borderWidth = 0;
 
-        const th = document.createElement("th");
-        th.style.borderWidth = 0;
-        const text = document.createTextNode(title);
+        const tr1 = document.createElement("tr");
+        tr1.style.backgroundColor = "inherit";
+        tr1.style.borderWidth = 0;
 
-        th.appendChild(text);
-        tr.appendChild(th);
-        tableHead.appendChild(tr);
+        const text = document.createTextNode(title.split(":")[1]);
+        const div = document.createTextNode(title.split(":")[0] + ":")
+        tr1.appendChild(div);
+
+        tr.appendChild(text);
+        tableBody1.appendChild(tr1)
+        tableBody1.appendChild(tr);
       });
 
       const tableBody = document.createElement("tbody");
       bodyLines.forEach((body, i) => {
-        const colors = tooltip.labelColors[i];
 
-        const span = document.createElement("span");
-        span.style.background = colors.backgroundColor;
-        span.style.borderColor = colors.borderColor;
-        span.style.borderWidth = "2px";
-        span.style.marginRight = "10px";
-        span.style.height = "10px";
-        span.style.width = "10px";
-        span.style.display = "inline-block";
+        const tr1 = document.createElement("tr");
+        tr1.style.backgroundColor = "inherit";
+        tr1.style.borderWidth = 0;
 
-        const tr = document.createElement("tr");
-        tr.style.backgroundColor = "inherit";
-        tr.style.borderWidth = 0;
+        const tr2 = document.createElement("tr");
+        tr2.style.backgroundColor = "inherit";
+        tr2.style.borderWidth = 0;
+        tr2.style.fontWeight = 700
 
-        const td = document.createElement("td");
-        td.style.borderWidth = 0;
+        const tr3 = document.createElement("tr");
+        tr3.style.backgroundColor = "inherit";
+        tr3.style.borderWidth = 0;
 
-        const text = document.createTextNode(body);
+        const text1 = document.createTextNode(body[0].split(":")[1]);
+        const text2 = document.createTextNode(body[0].split(":")[0] + ":")
 
         const link = document.createElement("a");
         link.href = tooltip.dataPoints[i].parsed.link;
         link.target = "_blank";
-        link.textContent = "Open Link";
+        link.textContent = "Update Dashboard";
         link.style.cursor = "pointer";
+        link.style.color = "#ED6E0C";
 
         link.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -123,12 +131,14 @@ function ScatterChartWithZoom() {
           link.style.textDecoration = "none";
         });
 
-        td.appendChild(span);
-        td.appendChild(text);
-        td.appendChild(link);
+        tr1.appendChild(text1);
+        tr2.appendChild(text2);
+        tr3.appendChild(link);
 
-        tr.appendChild(td);
-        tableBody.appendChild(tr);
+        // tr.appendChild(td);
+        tableBody.appendChild(tr2);
+        tableBody.appendChild(tr1);
+        tableBody.appendChild(tr3);
       });
 
       const tableRoot = tooltipEl.querySelector("table");
@@ -137,12 +147,19 @@ function ScatterChartWithZoom() {
         tableRoot.firstChild.remove();
       }
 
-      tableRoot.appendChild(tableHead);
+
       tableRoot.appendChild(tableBody);
+
+      tooltipEl.addEventListener("click", (e) => {
+        console.log("Sfdsfsf");
+      });
+      tooltipEl.style.backgroundColor = "white";
+      tooltipEl.style.color = "black";
     }
 
     const { offsetLeft: positionX, offsetTop: positionY } = chart.canvas;
-
+    tooltipEl.style.boxShadow = "2px 2px 6px rgba(0, 0, 0, 0.1)";
+    tooltipEl.style.borderRadius = "10px";
     tooltipEl.style.opacity = 1;
     tooltipEl.style.left = positionX + tooltip.caretX + "px";
     tooltipEl.style.top = positionY + tooltip.caretY + "px";
@@ -151,42 +168,40 @@ function ScatterChartWithZoom() {
       tooltip.options.padding + "px " + tooltip.options.padding + "px";
     tooltipEl.style.pointerEvents = "auto";
   };
-
-
   const data = {
     datasets: [
       {
-        label: "Scatter Dataset",
+        label: "Food categories",
         data: [
           {
             x: 2500000,
             y: 10,
             category: "Appetizer - Mexican",
-            link: "http://example1.com",
+
           },
           {
             x: 4000000,
             y: 30,
             category: "Main Course - Italian",
-            link: "http://example2.com",
+
           },
           {
             x: 5500000,
             y: 50,
             category: "Dessert - French",
-            link: "http://example3.com",
+
           },
           {
             x: 8000000,
             y: 80,
             category: "Appetizer - Chinese",
-            link: "http://example4.com",
+
           },
           {
             x: 11000000,
             y: 100,
             category: "Main Course - Indian",
-            link: "http://example5.com",
+
           },
         ],
         backgroundColor: "#ED6E0C",
@@ -198,6 +213,9 @@ function ScatterChartWithZoom() {
       },
     ],
   }
+
+
+
   var annotation = {
     type: 'line',
     yMin: 60,
@@ -220,8 +238,9 @@ function ScatterChartWithZoom() {
     yMax: 1200000,
     borderColor: 'rgb(45, 45, 46)',
     backgroundColor: 'rgba(147, 146, 148, 0.3)',
-    borderWidth: 2,
+    borderWidth: 0,
   }
+
   const options = {
     scales: {
       x: {
@@ -255,8 +274,9 @@ function ScatterChartWithZoom() {
         },
         ticks: {
           callback: function (value) {
-            return `$${value}`;
+            return `$${Math.round(value)}`;
           },
+          precision: 0,
         },
         grid: {
           display: true,
@@ -298,10 +318,14 @@ function ScatterChartWithZoom() {
       },
       tooltip: {
         events: ["click"],
+        // onclick:{
+        //   console.log("980980");
+        // },
         callbacks: {
           label: function (context) {
+            context.chart.tooltip.labelColors[0].backgroundColor = "#ffffff"
             const point = context.raw;
-            return `Category: ${point.category} | Link: ${point.link}`;
+            return `Category: ${point.category}`;
           },
         },
         position: "nearest",
