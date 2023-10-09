@@ -8,9 +8,8 @@ import {
   Title,
   Tooltip,
   Legend,
-  Chart
 } from "chart.js";
-import { Line, Scatter } from "react-chartjs-2";
+import { Scatter } from "react-chartjs-2";
 import annotationZoom from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
 
@@ -29,7 +28,7 @@ ChartJS.register(
 
 
 function ScatterChartWithZoom() {
-  const chartRef = React.useRef(null);
+
 
   const getOrCreateTooltip = (chart) => {
     let tooltipEl = chart.canvas.parentNode.querySelector("div");
@@ -56,18 +55,42 @@ function ScatterChartWithZoom() {
 
     return tooltipEl;
   };
-
   const externalTooltipHandler = (context) => {
     const { chart, tooltip } = context;
     const tooltipEl = getOrCreateTooltip(chart);
 
-    console.log(tooltip)
-    tooltip.labelColors[0].backgroundColor = "#ffffff"
-    tooltip.labelColors[0].borderColor = "#ffffff"
+    tooltip.labelColors[0].backgroundColor = "#ffffff";
+    tooltip.labelColors[0].borderColor = "#ffffff";
+
     if (tooltip.opacity === 0) {
       tooltipEl.style.opacity = 0;
+
+
+      chart.data.datasets.forEach((dataset) => {
+        dataset.pointBackgroundColor = dataset.data.map(() => "#ED6E0C");
+        dataset.pointBorderColor = dataset.data.map(() => "#ED6E0C");
+      });
+
+      chart.update();
       return;
     }
+
+    if (tooltip.body) {
+      const { dataIndex } = tooltip.dataPoints[0];
+      const dataset = chart.data.datasets[0];
+
+
+      dataset.pointBackgroundColor = dataset.data.map((_, index) =>
+        index === dataIndex ? "#ffffff" : "#ED6E0C"
+      );
+
+      dataset.pointBorderColor = dataset.data.map((_, index) =>
+        index === dataIndex ? "#ED6E0C" : "#ED6E0C"
+      );
+
+      chart.update();
+    }
+
 
     if (tooltip.body) {
       const titleLines = tooltip.title || [];
@@ -210,11 +233,13 @@ function ScatterChartWithZoom() {
         pointRadius: 7,
         pointHoverRadius: 10,
         pointStyle: "circle",
+        pointBackgroundColor: "#ED6E0C",
+        pointBorderColor: "#ED6E0C",
+        pointBorderWidth: 3,
+
       },
     ],
   }
-
-
 
   var annotation = {
     type: 'line',
@@ -319,14 +344,21 @@ function ScatterChartWithZoom() {
       tooltip: {
         events: ["click"],
         // onclick:{
-        //   console.log("980980");
+        //   console.log("980980")
         // },
+
+        usePointStyle: true,
         callbacks: {
           label: function (context) {
-            context.chart.tooltip.labelColors[0].backgroundColor = "#ffffff"
             const point = context.raw;
             return `Category: ${point.category}`;
           },
+          labelPointStyle: function (context) {
+            return {
+              pointStyle: 'triangle',
+              rotation: 0
+            };
+          }
         },
         position: "nearest",
         enabled: false,
@@ -357,7 +389,7 @@ function ScatterChartWithZoom() {
       ctx.moveTo(xAxis.left, centerY);
       ctx.lineTo(xAxis.right, centerY);
       ctx.stroke();
-
+      console.log("chart");
 
       const centerX = xAxis.getPixelForValue((xAxis.max + xAxis.min) / 2);
       ctx.strokeStyle = "rgba(255, 0, 0, 1)";
