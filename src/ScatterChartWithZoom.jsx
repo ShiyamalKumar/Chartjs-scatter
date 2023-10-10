@@ -23,18 +23,13 @@ ChartJS.register(
   Legend,
   annotationPlugin,
   annotationZoom
-
 );
 
-
 function ScatterChartWithZoom() {
-
-
   const getOrCreateTooltip = (chart) => {
     let tooltipEl = chart.canvas.parentNode.querySelector("div");
 
     if (!tooltipEl) {
-
       tooltipEl = document.createElement("div");
       tooltipEl.style.background = "rgba(0, 0, 0, 0.7)";
       tooltipEl.style.color = "white";
@@ -55,6 +50,7 @@ function ScatterChartWithZoom() {
 
     return tooltipEl;
   };
+
   const externalTooltipHandler = (context) => {
     const { chart, tooltip } = context;
     const tooltipEl = getOrCreateTooltip(chart);
@@ -65,10 +61,10 @@ function ScatterChartWithZoom() {
     if (tooltip.opacity === 0) {
       tooltipEl.style.opacity = 0;
 
-
       chart.data.datasets.forEach((dataset) => {
         dataset.pointBackgroundColor = dataset.data.map(() => "#ED6E0C");
         dataset.pointBorderColor = dataset.data.map(() => "#ED6E0C");
+        dataset.pointRadius = 5;
       });
 
       chart.update();
@@ -79,7 +75,6 @@ function ScatterChartWithZoom() {
       const { dataIndex } = tooltip.dataPoints[0];
       const dataset = chart.data.datasets[0];
 
-
       dataset.pointBackgroundColor = dataset.data.map((_, index) =>
         index === dataIndex ? "#ffffff" : "#ED6E0C"
       );
@@ -87,15 +82,16 @@ function ScatterChartWithZoom() {
       dataset.pointBorderColor = dataset.data.map((_, index) =>
         index === dataIndex ? "#ED6E0C" : "#ED6E0C"
       );
+      dataset.pointRadius = dataset.data.map((_, index) =>
+        index === dataIndex ? 7.5 : 5
+      );
 
       chart.update();
     }
 
-
     if (tooltip.body) {
       const titleLines = tooltip.title || [];
       const bodyLines = tooltip.body.map((b) => b.lines);
-
 
       const tableBody1 = document.createElement("tbody");
 
@@ -118,7 +114,6 @@ function ScatterChartWithZoom() {
 
       const tableBody = document.createElement("tbody");
       bodyLines.forEach((body, i) => {
-
         const tr1 = document.createElement("tr");
         tr1.style.backgroundColor = "inherit";
         tr1.style.borderWidth = 0;
@@ -140,7 +135,7 @@ function ScatterChartWithZoom() {
         link.target = "_blank";
         link.textContent = "Update Dashboard";
         link.style.cursor = "pointer";
-        link.style.color = "#ED6E0C";
+        link.style.color = "#C6430C";
 
         link.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -158,7 +153,6 @@ function ScatterChartWithZoom() {
         tr2.appendChild(text2);
         tr3.appendChild(link);
 
-
         tableBody.appendChild(tr2);
         tableBody.appendChild(tr1);
         tableBody.appendChild(tr3);
@@ -170,27 +164,27 @@ function ScatterChartWithZoom() {
         tableRoot.firstChild.remove();
       }
 
-
       tableRoot.appendChild(tableBody);
 
       tooltipEl.addEventListener("click", (e) => {
         console.log("Sfdsfsf");
       });
       tooltipEl.style.backgroundColor = "white";
-      tooltipEl.style.color = "black";
+      tooltipEl.style.color = "#43364C";
     }
 
     const { offsetLeft: positionX, offsetTop: positionY } = chart.canvas;
     tooltipEl.style.boxShadow = "2px 2px 6px rgba(0, 0, 0, 0.1)";
-    tooltipEl.style.borderRadius = "10px";
+    tooltipEl.style.borderRadius = "3px";
     tooltipEl.style.opacity = 1;
-    tooltipEl.style.left = positionX + tooltip.caretX + "px";
-    tooltipEl.style.top = positionY + tooltip.caretY + "px";
+    tooltipEl.style.left = positionX + tooltip.caretX + 90 + "px";
+    tooltipEl.style.top = positionY + tooltip.caretY + 10 + "px";
     tooltipEl.style.font = tooltip.options.bodyFont.string;
     tooltipEl.style.padding =
       tooltip.options.padding + "px " + tooltip.options.padding + "px";
     tooltipEl.style.pointerEvents = "auto";
   };
+
   const data = {
     datasets: [
       {
@@ -200,43 +194,42 @@ function ScatterChartWithZoom() {
             x: 2500000,
             y: 10,
             category: "Appetizer - Mexican",
-
+            z: 999,
           },
           {
             x: 4000000,
             y: 30,
             category: "Main Course - Italian",
-
+            z: 999,
           },
           {
             x: 5500000,
             y: 50,
             category: "Dessert - French",
-
+            z: 999,
           },
           {
             x: 8000000,
             y: 80,
             category: "Appetizer - Chinese",
-
+            z: 999,
           },
           {
             x: 11000000,
             y: 100,
             category: "Main Course - Indian",
-
+            z: 999,
           },
         ],
         backgroundColor: "#ED6E0C",
         borderColor: "#ED6E0C",
         borderWidth: 1,
-        pointRadius: 7,
-        pointHoverRadius: 10,
+        pointRadius: 5,
         pointStyle: "circle",
         pointBackgroundColor: "#ED6E0C",
         pointBorderColor: "#ED6E0C",
         pointBorderWidth: 3,
-
+        z: 99999
       },
     ],
   }
@@ -261,12 +254,16 @@ function ScatterChartWithZoom() {
     xMax: Infinity,
     yMin: 60,
     yMax: 1200000,
+    z: 2,
     borderColor: 'rgb(45, 45, 46)',
-    backgroundColor: 'rgba(147, 146, 148, 0.3)',
+    backgroundColor: '#F1F0F3',
     borderWidth: 0,
+    drawTime: "beforeDraw"
   }
 
   const options = {
+    responsive: true,
+    maintainAspectRatio: false,
     scales: {
       x: {
         type: "linear",
@@ -277,17 +274,17 @@ function ScatterChartWithZoom() {
           display: true,
           text: "Invoice Savings",
         },
+        padding: {
+          top: 10,
+          bottom: 10,
+        },
         ticks: {
           callback: function (value) {
-            return `$${(value / 1000000).toFixed(2)}M`;
+            return `$${Math.round(value / 1000000)}M`;
           },
         },
         grid: {
-          display: true,
-          color: "rgba(0, 0, 0, 0.7)",
-          lineWidth: 2,
           drawOnChartArea: false,
-          borderDash: [5, 5],
         },
       },
       y: {
@@ -297,6 +294,10 @@ function ScatterChartWithZoom() {
           display: true,
           text: "Client Payment",
         },
+        padding: {
+          top: 10,
+          bottom: 10,
+        },
         ticks: {
           callback: function (value) {
             return `$${Math.round(value)}`;
@@ -304,14 +305,9 @@ function ScatterChartWithZoom() {
           precision: 0,
         },
         grid: {
-          display: true,
-          color: "rgba(0, 0, 0, 0.7)",
-          lineWidth: 2,
           drawOnChartArea: false,
-          borderDash: [5, 5],
         },
       },
-
     },
     plugins: {
       annotation: {
@@ -343,8 +339,6 @@ function ScatterChartWithZoom() {
       },
       tooltip: {
         events: ["click"],
-
-
         usePointStyle: true,
         callbacks: {
           label: function (context) {
@@ -364,10 +358,10 @@ function ScatterChartWithZoom() {
         backgroundColor: "rgba(0, 0, 0, 0.7)",
         bodyFontColor: "white",
         bodyFontFamily: "Arial",
-        bodyFontSize: 12,
+        bodyFontSize: 14,
         bodySpacing: 4,
         bodyFontStyle: "normal",
-        padding: 8,
+        padding: 15,
         cornerRadius: 3,
         displayColors: false,
       },
@@ -387,7 +381,6 @@ function ScatterChartWithZoom() {
       ctx.moveTo(xAxis.left, centerY);
       ctx.lineTo(xAxis.right, centerY);
       ctx.stroke();
-      console.log("chart");
 
       const centerX = xAxis.getPixelForValue((xAxis.max + xAxis.min) / 2);
       ctx.strokeStyle = "rgba(255, 0, 0, 1)";
@@ -396,8 +389,15 @@ function ScatterChartWithZoom() {
       ctx.lineTo(centerX, yAxis.bottom);
       ctx.stroke();
     },
-  }
-  return <Scatter data={data} options={options} />
+    tooltips: { enabled: false },
+    hover: { mode: null },
+  };
+
+  return (
+    <div style={{ width: "100%", maxWidth: "800px", margin: "0 auto", height: "400px" }}>
+      <Scatter data={data} options={options} />
+    </div>
+  );
 }
 
 export default ScatterChartWithZoom;
